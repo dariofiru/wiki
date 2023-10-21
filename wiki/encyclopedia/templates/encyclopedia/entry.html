@@ -1,0 +1,9 @@
+{% extends 'encyclopedia/layout.html' %}
+
+
+{% block body %} 
+{% autoescape off %} {{ entry }} {% endautoescape %}
+<!-- new content goes here --><br>
+
+<a href="/wiki/modify/{{id}}" name=id id=id>Modify</a>
+{% endblock body %}
