@@ -1,8 +1,9 @@
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 from django.shortcuts import render
 from . import util
 import markdown2
 from  .form import InputForm, ModifyForm
+from random import randrange
 
 from . import util
 
@@ -69,3 +70,15 @@ def modify(request, id):
         
        # form.fields["title"].initial=entry.title       # form.body=entry.content
     return render(request, "encyclopedia/modify.html", {"form": form, "id": id})
+
+
+def random(request):
+    entries = util.list_entries()
+    page = entries[randrange(len(entries))]
+    entry=util.get_entry(page)
+    html_string = markdown2.markdown(entry)
+    #return HttpResponse(f"{html_string}")
+    return render(request, "encyclopedia/entry.html", {
+        "entry": html_string, "id": page
+    })
+    #return HttpResponse(f"eccoci {entry} - {randrange(len(entries))}")
