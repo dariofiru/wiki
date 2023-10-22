@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from . import util
 import markdown2
+import re
 from  .form import InputForm, ModifyForm
 from random import randrange
 
@@ -9,9 +10,19 @@ from . import util
 
 
 def index(request):
-    return render(request, "encyclopedia/index.html", {
-        "entries": util.list_entries()
-    })
+    search = request.GET.get('q')
+    if search is None:
+        return render(request, "encyclopedia/index.html", {
+            "entries": util.list_entries()
+        })
+    else:
+        entries = util.list_entries()
+        r = re.compile(".*"+search+".*", re.IGNORECASE)
+        newlist = list(filter(r.match, entries)) # Read Note below
+        return render(request, "encyclopedia/index.html", {
+            "entries": newlist
+        })
+        
 
 def test(request):
     return HttpResponse("hello testing")
@@ -81,4 +92,10 @@ def random(request):
     return render(request, "encyclopedia/entry.html", {
         "entry": html_string, "id": page
     })
-    #return HttpResponse(f"eccoci {entry} - {randrange(len(entries))}")
+    
+
+def search(request):
+    entries = util.list_entries()
+    r = re.compile(".*r*")
+    newlist = list(filter(r.match, entries)) # Read Note below
+    return HttpResponse(f"{newlist}")
