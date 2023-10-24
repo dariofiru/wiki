@@ -84,8 +84,13 @@ def bid(request,id):
             product_detail = Product.objects.filter(id=id_temp)
             product_bid_high = Product.objects.filter(id=id_temp,product_starting_bid__gte=bid)
             if not product_bid_high:
+                    looser_bid = Auction.objects.all() # add filter for proper bids
+                    for auction in looser_bid:
+                         auction.winning_bid = False 
+                         auction.save(update_fields=["winning_bid"]) 
                     bid_details= Auction(product_sold=product_detail.first(), user_bid=request.user,amount_bid=bid, winning_bid=True)
-                    bid_details.save()
+                    bid_details.save()    
+
                     return render(request, "auctions/bid.html", {
                 "product_detail": product_detail , "form": form, "error": "3w"
                  })
