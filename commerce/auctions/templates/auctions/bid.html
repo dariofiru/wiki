@@ -1,0 +1,20 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+
+{% for product in product_detail %}
+   <h4>{{product.product_name}}</h4> 
+   <p>{{product.product_description}}</p>
+   <img src="{{product.product_img_url}}" width="180px"><br>
+   <form method="post" action="{{product.id}}">
+    {% csrf_token %}
+    <input type="hidden" name="id" value="{{product.id}}">
+bid: {{ form.bid }} <br> 
+<input type="submit" value="Submit">
+   {% endfor %} 
+<br><br>
+   {{error}}
+   <br>{{product_detail}}
+
+{% endblock %}

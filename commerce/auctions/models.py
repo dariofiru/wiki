@@ -46,10 +46,11 @@ class Product(models.Model):
         return f"product: {self.product_name}"
     
 class Auction(models.Model):
-    product_sold = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product_sold = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="products_bidded")
     user_bid = models.ForeignKey(User, on_delete=models.CASCADE)
     amount_bid = models.DecimalField(decimal_places=2, max_digits=12)
     winning_bid = models.BooleanField(default=True)
+     
     def __str__(self) -> str:
         return f"Auction: {self.product_sold}"      
 
@@ -66,3 +67,40 @@ class Comment(models.Model):
     comment_date_inserted = models.DateField(default=datetime.date.today)
     def __str__(self) -> str:
         return f"Comment: {self.user_comment} on {self.product_comment}"    
+
+
+ ###############
+ ###############
+
+class Product2(models.Model):
+    STATUS_CHOICES = (
+    ('active','ACTIVE'),
+    ('inactive', 'INACTIVE'),
+    ('sold','SOLD')
+    )
+    CAT_CHOICES = (('Pottery', 'Pottery'),
+              ('Sport', 'Sport'),
+              ('Forniture', 'Forniture'),
+              ('Collectables', 'Collectables'),
+              ('Memorabilia', 'Memorabilia'))
+    
+    product_bids = models.ManyToManyField(Auction, blank=True, related_name="bids")
+    product_owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    product_name = models.CharField(max_length=70)
+    product_description = models.CharField(max_length=300)
+    product_img_url = models.CharField(max_length=500, blank=True, null=True)
+    product_categories = MultiSelectField(choices=CAT_CHOICES,
+                                 max_choices=3,
+                                 max_length=38)
+
+
+    product_starting_bid = models.DecimalField(decimal_places=2, max_digits=12)
+    product_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
+    date_inserted = models.DateField(default=datetime.date.today)
+    date_sold = models.DateField(blank=True, null=True)
+    product_price = models.DecimalField(decimal_places=2, max_digits=12, blank=True, null=True)
+
+    def __str__(self) -> str:
+        return f"product: {self.product_name}"
+    
+ 

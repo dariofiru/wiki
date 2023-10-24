@@ -7,20 +7,18 @@
    <p>{{product.product_description}}</p>
    <img src="{{product.product_img_url}}" width="180px"><br>
    Categories: {{product.product_categories}}<br>
-   Starting price: ${{product.product_starting_bid }}
-
-   {% for auction in auction_list %}
-   {{ forloop.counter0 }}
-   {{product.id}} ? {{auction.0}}<br>{{auction}}<br>{{auction_list}}
-   {% if product.id == auction.product_sold.product_sold_id %}
-    {{auction.amount_bid}}
-   {% endif %}
+   Starting price: ${{product.product_starting_bid }}<br>
+ 
+   {% for auction in auction_bid %}
+   {% if auction.winning_bid == True and product.id == auction.product_sold.id %}
+   Highest bid: <b>${{auction.amount_bid}}</b>
+   {{product.id}} :{{auction.product_sold.id}} => {{auction.winning_bid}}  => {{auction.amount_bid}}<br> 
+   {% endif %} 
    {% endfor %} 
-
+   {% if product.product_status == 'active' %}
+   <a href="auctions/bid/{{product.id}}">bid</a>
+   {% endif %} 
     <hr>
    {% endfor %}
-
-   {{auction_list}}<br>
-   {{product_list}}<br>
-   {{test_data}}
+ 
 {% endblock %}

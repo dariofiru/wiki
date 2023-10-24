@@ -3,6 +3,8 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.db.models import Q
+from  .form import BidForm
 
 from .models import User, Product, Auction, Watchlist, Comment
 
@@ -23,17 +25,14 @@ def login_view(request):
         if user is not None:
             # success 
             login(request, user)
-            product_list = Product.objects.filter(product_owner=user)
-            auction_data = []
+            product_list = Product.objects.filter(product_status='active')
+             
             for product in product_list:
-                if Auction.objects.filter(product_sold=product):
-                   auction_data.append(Auction.objects.filter(product_sold=product).values()) 
-
-            test_data= Product.objects.select_related("product_owner")
-            auction_list=auction_data
+                auction_bid = Auction.objects.select_related().filter()
+               
            # return HttpResponseRedirect(reverse("index"))
             return render(request, "auctions/index.html", {
-                "product_list": product_list, "auction_list": auction_list, "test_data" : test_data
+                "product_list": product_list, "auction_bid": auction_bid
             })
         else:
             return render(request, "auctions/login.html", {
@@ -73,3 +72,33 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+
+def bid(request,id):
+    if request.method == "POST":
+        # create a form instance and populate it with data from the request:
+        form = BidForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            id_temp = request.POST["id"]
+            bid = form.cleaned_data["bid"]
+            product_detail = Product.objects.filter(id=id_temp)
+            product_bid_high = Product.objects.filter(id=id_temp,product_starting_bid__gte=bid)
+            if not product_bid_high:
+                    bid_details= Auction(product_sold=product_detail.first(), user_bid=request.user,amount_bid=bid, winning_bid=True)
+                    bid_details.save()
+                    return render(request, "auctions/bid.html", {
+                "product_detail": product_detail , "form": form, "error": "3w"
+                 })
+            else:
+                                return render(request, "auctions/bid.html", {
+                "product_detail": product_detail , "form": form, "error": product_bid_high
+                 })
+      
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form =  BidForm()
+    
+    product_detail = Product.objects.filter(id=id)
+    return render(request, "auctions/bid.html", {
+                "product_detail": product_detail , "form": form,"error":"no"
+            })
