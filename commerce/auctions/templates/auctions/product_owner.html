@@ -7,13 +7,29 @@
    <h4>{{product.product_name}}</h4> 
    <p>{{product.product_description}}</p>
    <img src="{{product.product_img_url}}" width="180px"><br>
-   <form method="post" action="{{product.id}}">
-    {% csrf_token %}
+    
+   {% if max_bid == "na" %}
+   <p>no bids received yet</p>
  
-<input type="submit" value="Accept">
+    {% else %}
+    <p>Highest bid:
+        ${{max_bid}}</p>
+{% endif %}
+{% if not accepted_bid   %}
+   <p><form method="post" action="accept_bid/{{product.id}}">
+    {% csrf_token %}
+    <input type="hidden" name="bid_id" value="{{bid_id}}">
+<input type="submit" value="Accept"></p>
+{% else %}
+    <p>Bid accepted!!</p>
+    {% endif %}
    {% endfor %} 
 <br><br>
-   {{error}}
+   {{error}} - {{tot}}
    <br>{{product_detail}}
-
+   <br>{{product_update}}
+   <br>{{aa}}
+   <br>{{product_update.product_status}}
+   <br>{{product_update.product_price}}
+   
 {% endblock %}

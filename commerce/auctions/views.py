@@ -3,7 +3,9 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.db.models import Q
+from django.db.models import Q, Max
+from datetime import date
+from decimal import Decimal
 from  .form import BidForm
 
 from .models import User, Product, Auction, Watchlist, Comment
@@ -75,9 +77,17 @@ def register(request):
 
 def bid(request,id):
     product_detail = Product.objects.filter(id=id, product_owner=request.user)
+    max_bid_model = Auction.objects.filter(product_sold=product_detail.first(),winning_bid=True ).first() 
+    if not max_bid_model:
+         max_bid = "na"
+         bid_id="na"
+    else:
+         max_bid =  getattr(max_bid_model, "amount_bid")
+         bid_id =  getattr(max_bid_model, "id")
+
     if product_detail: 
         return render(request, "auctions/product_owner.html", {
-                "product_detail": product_detail ,  "error":"no"
+                "product_detail": product_detail ,  "error":"no", "max_bid" : max_bid, "bid_id": bid_id
             })
 
     if request.method == "POST":
@@ -125,4 +135,33 @@ def open_listing(request, id):
                 "product_detail": product_detail ,  "error":"no"
             })
          
-     
+    
+def accept_bid(request,id):
+      if request.method == "POST":
+        #username = request.POST["username"]
+        #product_id = request.POST["id"]
+        bid_id = request.POST["bid_id"] 
+        product_detail = Product.objects.filter(id=id)
+       # product_update = product_detail.first()   
+        max_bid_model = Auction.objects.filter(id=bid_id,winning_bid=True).get() 
+        #max_bid =  getattr(max_bid_model, "amount_bid")                     
+        max_bid= max_bid_model.amount_bid
+       # product_update.product_status = "sold" 
+        #product_update.product_price = max_bid
+        #roduct_update.date_sold=date.today()
+        #product_update.save()
+
+        Product.objects.filter(id=id).update(product_status="sold",date_sold=date.today() ,product_price=max_bid)
+
+
+        bids = Auction.objects.filter(product_sold=Product.objects.filter(id=id).first())  #retrive all bids on product
+        for auction in bids:
+                auction.status_bid = "inactive" 
+                auction.save(update_fields=["status_bid"]) 
+
+        #product_update.save(update_fields=["product_status", "date_sold","product_price"]) 
+         
+        return render(request, "auctions/product_owner.html", {
+                "product_detail": product_detail ,  "accepted_bid":"true" ,  "error":bid_id, "tot":max_bid
+            
+            })

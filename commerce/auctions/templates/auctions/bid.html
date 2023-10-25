@@ -7,13 +7,15 @@
    <h4>{{product.product_name}}</h4> 
    <p>{{product.product_description}}</p>
    <img src="{{product.product_img_url}}" width="180px"><br>
+    <p>  </p>
+
    <form method="post" action="{{product.id}}">
     {% csrf_token %}
     <input type="hidden" name="id" value="{{product.id}}">
 bid: {{ form.bid }} <br> 
 <input type="submit" value="Submit">
    {% endfor %} 
-<br><br>
+<br><br></form>
    {{error}}
    <br>{{product_detail}}
 
