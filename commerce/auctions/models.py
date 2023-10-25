@@ -43,7 +43,7 @@ class Product(models.Model):
             super().save(*args, **kwargs)  # Call the "real" save() metho
 
     def __str__(self) -> str:
-        return f"product: {self.product_name}"
+        return f"product: {self.product_name} - {self.product_status}"
     
 class Auction(models.Model):
     product_sold = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="products_bidded")
@@ -52,7 +52,7 @@ class Auction(models.Model):
     winning_bid = models.BooleanField(default=True)
      
     def __str__(self) -> str:
-        return f"Auction: {self.product_sold}"      
+        return f"Auction: {self.product_sold} - {self.amount_bid} - {self.winning_bid}"      
 
 class Watchlist(models.Model):
     user_watchlist = models.ForeignKey(User, on_delete=models.CASCADE)

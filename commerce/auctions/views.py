@@ -74,6 +74,12 @@ def register(request):
         return render(request, "auctions/register.html")
 
 def bid(request,id):
+    product_detail = Product.objects.filter(id=id, product_owner=request.user)
+    if product_detail: 
+        return render(request, "auctions/product_owner.html", {
+                "product_detail": product_detail ,  "error":"no"
+            })
+
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
         form = BidForm(request.POST)
@@ -81,10 +87,12 @@ def bid(request,id):
         if form.is_valid():
             id_temp = request.POST["id"]
             bid = form.cleaned_data["bid"]
-            product_detail = Product.objects.filter(id=id_temp)
-            product_bid_high = Product.objects.filter(id=id_temp,product_starting_bid__gte=bid)
-            if not product_bid_high:
-                    looser_bid = Auction.objects.all() # add filter for proper bids
+            product_detail = Product.objects.filter(id=id_temp) 
+            product_bid_high = Product.objects.filter(id=id_temp,product_starting_bid__gte=bid) #check product starting price
+            auction_bid_high = Auction.objects.filter(product_sold=product_detail.first(),amount_bid__gte=bid) #
+            if not product_bid_high and not auction_bid_high:
+                    looser_bid_tmp=Auction.objects.all()
+                    looser_bid = looser_bid_tmp.filter(product_sold=product_detail.first())  #retrive all bids on product
                     for auction in looser_bid:
                          auction.winning_bid = False 
                          auction.save(update_fields=["winning_bid"]) 
@@ -92,11 +100,11 @@ def bid(request,id):
                     bid_details.save()    
 
                     return render(request, "auctions/bid.html", {
-                "product_detail": product_detail , "form": form, "error": "3w"
+                "product_detail": product_detail , "form": form, "error": "Bid Accepted"
                  })
             else:
                                 return render(request, "auctions/bid.html", {
-                "product_detail": product_detail , "form": form, "error": product_bid_high
+                "product_detail": product_detail , "form": form, "error": "bid rejected"
                  })
       
     # if a GET (or any other method) we'll create a blank form
@@ -107,3 +115,14 @@ def bid(request,id):
     return render(request, "auctions/bid.html", {
                 "product_detail": product_detail , "form": form,"error":"no"
             })
+
+def open_listing(request, id):
+    product_detail = Product.objects.filter(id=id, product_owner=request.user)
+    if not product_detail: 
+         bid(request, id)
+    else:
+         return render(request, "auctions/product_owner.html", {
+                "product_detail": product_detail ,  "error":"no"
+            })
+         
+     
