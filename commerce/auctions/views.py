@@ -6,13 +6,22 @@ from django.urls import reverse
 from django.db.models import Q, Max
 from datetime import date
 from decimal import Decimal
-from  .form import BidForm
+from  .form import BidForm, AddForm
 
 from .models import User, Product, Auction, Watchlist, Comment
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+            product_list = Product.objects.all()
+             
+            for product in product_list:
+                auction_bid = Auction.objects.select_related().filter()
+               
+           # return HttpResponseRedirect(reverse("index"))
+            return render(request, "auctions/index.html", {
+                "product_list": product_list, "auction_bid": auction_bid, "user": request.user
+            })
+  
 
 
 def login_view(request):
@@ -27,14 +36,14 @@ def login_view(request):
         if user is not None:
             # success 
             login(request, user)
-            product_list = Product.objects.filter(product_status='active')
+            product_list = Product.objects.all()
              
             for product in product_list:
                 auction_bid = Auction.objects.select_related().filter()
                
            # return HttpResponseRedirect(reverse("index"))
             return render(request, "auctions/index.html", {
-                "product_list": product_list, "auction_bid": auction_bid
+                "product_list": product_list, "auction_bid": auction_bid, "user": user
             })
         else:
             return render(request, "auctions/login.html", {
@@ -163,5 +172,28 @@ def accept_bid(request,id):
          
         return render(request, "auctions/product_owner.html", {
                 "product_detail": product_detail ,  "accepted_bid":"true" ,  "error":bid_id, "tot":max_bid
+            
+            })
+      
+def add(request):
+    if request.method == "POST":
+        # create a form instance and populate it with data from the request:
+            form = AddForm(request.POST)
+        # check whether it's valid:
+            if form.is_valid():
+                prod = Product(product_owner=request.user,product_name=form.cleaned_data['product_name'],
+                               product_description=form.cleaned_data['product_description'],
+                               product_img_url=form.cleaned_data['product_img_url'] ,
+                               product_starting_bid=form.cleaned_data['product_starting_bid'])
+                prod.save()
+                return render(request, "auctions/index.html", {
+        "entries": None
+    })
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form =  AddForm()
+
+        return render(request, "auctions/add.html", { "form" : form 
             
             })

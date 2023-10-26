@@ -14,21 +14,24 @@
     {% else %}
     <p>Highest bid:
         ${{max_bid}}</p>
+
+        {% if not accepted_bid   %}
+        <p><form method="post" action="accept_bid/{{product.id}}">
+         {% csrf_token %}
+         <input type="hidden" name="bid_id" value="{{bid_id}}">
+     <input type="submit" value="Accept"></p>
+     {% else %}
+         <p>Bid accepted!!</p>
+     {% endif %}
+
 {% endif %}
-{% if not accepted_bid   %}
-   <p><form method="post" action="accept_bid/{{product.id}}">
-    {% csrf_token %}
-    <input type="hidden" name="bid_id" value="{{bid_id}}">
-<input type="submit" value="Accept"></p>
-{% else %}
-    <p>Bid accepted!!</p>
-    {% endif %}
+
    {% endfor %} 
 <br><br>
    {{error}} - {{tot}}
    <br>{{product_detail}}
    <br>{{product_update}}
-   <br>{{aa}}
+   <br>max: {{max_bid}}
    <br>{{product_update.product_status}}
    <br>{{product_update.product_price}}
    

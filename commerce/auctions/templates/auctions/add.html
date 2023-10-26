@@ -1,0 +1,28 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<form method="post" action="add">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="formGroupExampleInput" class="form-label">Item Name:</label><br>{{form.product_name }}</span>
+
+</div>
+<div class="mb-3">
+    <label for="formGroupExampleInput" class="form-label">Item Description</span><br>
+    {{form.product_description}}
+  </div>
+
+ 
+Photo Link:{{form.product_img_url}}<br><br><br>
+
+<div class="input-group mb-3">
+    <span class="input-group-text">Initial Price: $</span>
+    {{form.product_starting_bid}}
+    <span class="input-group-text">.00</span>
+  </div>
+  Initial Price:{{form.product_starting_bid}}<br><br>
+<input type="submit" value="Submit"></form>
+{% for value, text in form.product_categories.field.choices %}
+aa<br>
+{% endfor %}
+{% endblock %}

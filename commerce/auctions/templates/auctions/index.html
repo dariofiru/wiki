@@ -2,7 +2,18 @@
 
 {% block body %}
     <h2>Active Listings</h2>
+
     {% for product in product_list %}
+
+
+
+
+
+
+
+
+
+    
    <h4>{{product.product_name}}</h4> 
    <p>{{product.product_description}}</p>
    <img src="{{product.product_img_url}}" width="180px"><br>
@@ -13,12 +24,24 @@
    {% if auction.winning_bid == True and product.id == auction.product_sold.id %}
    Highest bid: <b>${{auction.amount_bid}}</b>
    {{product.id}} :{{auction.product_sold.id}} => {{auction.winning_bid}}  => {{auction.amount_bid}}<br> 
+   {{product.product_owner }}<br>
    {% endif %} 
    {% endfor %} 
-   {% if product.product_status == 'active' %}
+
+   {% if product.product_status == 'active' and product.product_owner != user %}
    <a href="auctions/bid/{{product.id}}">bid</a>
+   {% elif product.product_status == 'active' and product.product_owner == user %}
+   <a href="auctions/bid/{{product.id}}">View</a>
+   {% elif product.product_status == 'sold' and product.product_owner == user %}
+   Sold for {{product.product_price}}
+   {% elif product.product_status == 'sold' and product.product_owner == user %}
+   item sold 
+   {% elif product.product_status == 'sold' %}
    {% endif %} 
     <hr>
    {% endfor %}
  
+
+{{user}}
+
 {% endblock %}
