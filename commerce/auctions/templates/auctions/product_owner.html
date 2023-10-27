@@ -3,29 +3,40 @@
 {% block body %}
 
 
+
+ 
+
+<div class="card mb-3" style="max-width: 540px;">
+   <div class="row g-0">
 {% for product in product_detail %}
-   <h4>{{product.product_name}}</h4> 
-   <p>{{product.product_description}}</p>
-   <img src="{{product.product_img_url}}" width="180px"><br>
-    
+<h5 class="card-title">{{product.product_name}}</h5> 
+<p class="card-text">{{product.product_description}}</p>
+   <div class="col-md-4">
+   <img src="{{product.product_img_url}}" class="img-fluid rounded-start"><br>
+   </div>
    {% if max_bid == "na" %}
    <p>no bids received yet</p>
  
     {% else %}
-    <p>Highest bid:
-        ${{max_bid}}</p>
+    <p style="padding:20px">Highest bid:
+        ${{max_bid}}<br>
+  
+      Placed by <b>{{max_bid_model.user_bid}}</b> on {{max_bid_model.date_bid}}
+      </p>
 
         {% if not accepted_bid   %}
         <p><form method="post" action="accept_bid/{{product.id}}">
          {% csrf_token %}
          <input type="hidden" name="bid_id" value="{{bid_id}}">
-     <input type="submit" value="Accept"></p>
+     <input type="submit" value="Accept"class="btn btn-primary mb-3">
+      </p>
      {% else %}
-         <p>Bid accepted!!</p>
+     <div class="alert alert-success" role="alert">Bid accepted!!</div>
      {% endif %}
 
 {% endif %}
-
+</div>
+</div>
    {% endfor %} 
 <br><br>
    {{error}} - {{tot}}
@@ -34,5 +45,5 @@
    <br>max: {{max_bid}}
    <br>{{product_update.product_status}}
    <br>{{product_update.product_price}}
-   
+
 {% endblock %}

@@ -1,22 +1,56 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-
-
 {% for product in product_detail %}
-   <h4>{{product.product_name}}</h4> 
-   <p>{{product.product_description}}</p>
-   <img src="{{product.product_img_url}}" width="180px"><br>
-    <p>  </p>
 
-   <form method="post" action="{{product.id}}">
-    {% csrf_token %}
-    <input type="hidden" name="id" value="{{product.id}}">
-bid: {{ form.bid }} <br> 
-<input type="submit" value="Submit">
-   {% endfor %} 
-<br><br></form>
-   {{error}}
-   <br>{{product_detail}}
+
+<div class="card mb-3" style="max-width: 540px;">
+    <div class="row g-0">
+      <div class="col-md-4">
+        <img src="{{product.product_img_url}}" class="img-fluid rounded-start" alt="...">
+      </div>
+      <div class="col-md-8">
+        <div class="card-body">
+          <h5 class="card-title">{{product.product_name}}</h5>
+          <p class="card-text">{{product.product_description}}<br>
+            <form method="post" action="{{product.id}}">
+                {% csrf_token %}
+                <input type="hidden" name="id" value="{{product.id}}"><br>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">$</span>
+             {{ form.bid }} 
+            <span class="input-group-text">.00</span>
+    </div><br> 
+            <div class="col-12">
+                <button class="btn btn-primary" type="submit">Submit bid!</button>
+              </div>
+              {%  if error == 'Bid accepted' %}
+              <hr>
+              <div class="alert alert-success" role="alert">
+                Bid accepted! Your bid is currently the highest 
+              </div>
+              {% elif error == 'Bid rejected' %}
+              <hr>
+              <div class="alert alert-danger" role="alert">
+                Your bid is not big enough! 
+              </div>
+              {% endif %}
+                   {% endfor %} 
+           </form> 
+        </p>
+          
+       </div>
+       </div>
+</div></div>
+</div><div class="vstack gap-3"></div>
+ {% for comment in comments %}
+ 
+    <div class="p-2"><b>{{comment.user_comment}}</b> wrote on  {{comment.comment_date_inserted}}:<br>
+        {{comment.comment}}</div>
+    {% endfor %}
+    
+  </div>
+  
+  
 
 {% endblock %}

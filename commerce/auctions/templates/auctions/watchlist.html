@@ -1,0 +1,46 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+ 
+ 
+    <h2>Watchlist</h2>
+
+    {% for watchlist in user_watch_list %}
+
+    
+      
+       
+         <div class="card mb-3" style="max-width: 540px;">
+            <div class="row g-0">
+              <div class="col-md-4">
+                <img src="{{watchlist.product_watchlist.product_img_url}}" class="img-fluid rounded-start" alt="...">
+              </div>
+              <div class="col-md-8">
+                <div class="card-body">
+                  <h5 class="card-title">{{watchlist.product_watchlist.product_name}}</h5>
+                  <p class="card-text">{{watchlist.product_watchlist.product_description}}<br><br>
+                    <a href="auctions/bid/{{watchlist.product_watchlist.id}}" class="btn btn-primary">Make a Bid!</a>
+                </p>
+                  <p class="card-text"><small class="text-body-secondary"> </small></p>  
+               </div>
+               </div>
+        </div>
+      </div>
+    </div>
+               <br>
+    
+<br>
+{% endfor %}
+ <br>
+   {% for product in product_watched %}
+  <br>{{product}}
+   {% endfor %} 
+  
+   
+ 
+   
+ 
+
+{{user}}<br>
+ 
+{% endblock %}

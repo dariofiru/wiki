@@ -1,47 +1,68 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
+ 
+ 
     <h2>Active Listings</h2>
 
     {% for product in product_list %}
 
-
-
-
-
-
-
-
-
     
-   <h4>{{product.product_name}}</h4> 
-   <p>{{product.product_description}}</p>
-   <img src="{{product.product_img_url}}" width="180px"><br>
-   Categories: {{product.product_categories}}<br>
-   Starting price: ${{product.product_starting_bid }}<br>
+  <!---  <div class="card" style="width: 18rem;">
+        <img src="{{product.product_img_url}}" class="card-img-top" alt="...">
+        <div class="card-body">
+            
+          <h5 class="card-title">{{product.product_name}}</h5>
+          <p class="card-text">{{product.product_description}}</p>
+         <br>
+        --->
+         <div class="card mb-3" style="max-width: 540px;">
+            <div class="row g-0">
+              <div class="col-md-4">
+                <img src="{{product.product_img_url}}" class="img-fluid rounded-start" alt="...">
+              </div>
+              <div class="col-md-8">
+                <div class="card-body">
+                  <h5 class="card-title">{{product.product_name}}</h5>
+                  <p class="card-text">{{product.product_description}}</p>
+                  <p class="card-text"><small class="text-body-secondary"> </small></p>
+               
+
+
+ 
  
    {% for auction in auction_bid %}
    {% if auction.winning_bid == True and product.id == auction.product_sold.id %}
-   Highest bid: <b>${{auction.amount_bid}}</b>
-   {{product.id}} :{{auction.product_sold.id}} => {{auction.winning_bid}}  => {{auction.amount_bid}}<br> 
-   {{product.product_owner }}<br>
+   Highest bid: <b>${{auction.amount_bid}}</b> 
+  
    {% endif %} 
    {% endfor %} 
-
+    <p style="padding:20px">
    {% if product.product_status == 'active' and product.product_owner != user %}
-   <a href="auctions/bid/{{product.id}}">bid</a>
+   <a href="auctions/bid/{{product.id}}" class="btn btn-primary">Make a Bid!</a>
+    
+   
+   <a href="auctions/watchlist/add/{{product.id}}" class="btn btn-primary" aria-disabled="true">Add to Watchlist</a>
+   
+  <!-- <a href="auctions/bid/{{product.id}}">bid</a>--->
    {% elif product.product_status == 'active' and product.product_owner == user %}
-   <a href="auctions/bid/{{product.id}}">View</a>
+   <a href="auctions/bid/{{product.id}}" class="btn btn-primary">View Details</a>
+   <div class="alert alert-secondary" role="alert">
+    Your Listing! 
+  </div>    
    {% elif product.product_status == 'sold' and product.product_owner == user %}
    Sold for {{product.product_price}}
-   {% elif product.product_status == 'sold' and product.product_owner == user %}
+   {% elif product.product_status == 'sold' and product.product_owner != user %}
    item sold 
    {% elif product.product_status == 'sold' %}
-   {% endif %} 
-    <hr>
+   {% endif %} </p>
+</div>
+</div>
+</div>
+</div>
    {% endfor %}
  
 
-{{user}}
-
+ 
+ New Listing created successfully <a href="{% url 'index' %}">return to Listing</a> {{test}} {{categ}}
 {% endblock %}
