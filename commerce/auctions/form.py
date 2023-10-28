@@ -12,21 +12,14 @@ class BidForm(forms.Form):
 class AddForm(forms.Form):
 
     categories = Category.objects.all()
-    CAT_CHOICES = (('Pottery', 'Pottery'),
-              ('Sport', 'Sport'),
-              ('Forniture', 'Forniture'),
-              ('Collectables', 'Collectables'),
-              ('Memorabilia', 'Memorabilia'))
-     
+
+    addform_flag = forms.BooleanField(widget=forms.HiddenInput, initial=True)
     product_name = forms.CharField(widget=forms.TextInput(attrs={'size':120}) )
     product_description= forms.CharField(widget=forms.Textarea(attrs={"rows":15, "cols":80}))
     product_img_url = forms.CharField(widget=forms.TextInput(attrs={'size':120}) )
-   # product_categories = MultiSelectField(choices=CAT_CHOICES ,
-    #                             max_choices=3,
-    #                             max_length=38)
-
     product_categories = forms.ModelMultipleChoiceField(queryset=Category.objects.all(), widget=forms.CheckboxSelectMultiple())
     product_starting_bid = forms.DecimalField(label="Initail price")
 
 class CommentForm(forms.Form):
     comment= forms.CharField(widget=forms.Textarea(attrs={"rows":9, "cols":40}))
+    commentform_flag = forms.BooleanField(widget=forms.HiddenInput, initial=True)

@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Max
 from datetime import date
 from decimal import Decimal
-from  .form import BidForm, AddForm
+from  .form import BidForm, AddForm, CommentForm
 
 from .models import User, Product, Auction, Watchlist, Comment, Category
 
@@ -282,4 +282,24 @@ def category_chosen(request, id):
                     #,                "user_watchlist": user_watch
                 }) 
 
+def comments(request, id):
+    product_detail = Product.objects.filter(id=id)
+    comments = Comment.objects.filter(product_comment=product_detail.first()).all()
+
+    # if this is a POST request we need to process the form data
+    if request.method == "POST":
+        # create a form instance and populate it with data from the request:
+        form = CommentForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            
+            return render(request, "auctions/comments.html", {
+        "comments": comments
+    })
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form =  CommentForm()
+
+    return render(request, "auctions/comments.html", {"comments": comments, "form": form})
      

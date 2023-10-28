@@ -50,7 +50,14 @@
     {% endfor %}
     
   </div>
+  <form method="post" action="{{comments}}">
+    {% csrf_token %}
+<input type="hidden"  value="{{product.id}}" name="id">
+<input type="hidden"  value="{{user}}" name="user">
+<textarea rows="4" cols="68" name="comment"></textarea>
+<input type="submit" value="save" name="save_comment">
+</form>
   
+   
   
-
 {% endblock %}
