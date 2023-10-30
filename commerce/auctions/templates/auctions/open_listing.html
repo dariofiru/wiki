@@ -1,0 +1,112 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+
+<div class="card mb-3" style="max-width: 540px;">
+    <div class="row g-0">
+      <div class="col-md-4">
+        <img src="{{product_detail.product_img_url}}" class="img-fluid rounded-start" alt="...">
+      </div>
+      <div class="col-md-8">
+        <div class="card-body">
+          <h5 class="card-title">{{product_detail.product_name}}</h5>
+          <h6 class="card-subtitle mb-2 text-body-secondary">{{product_detail.product_description}}</h6>
+          <p class="card-text"><small class="text-body-secondary">Starting bid: ${{product_detail.product_starting_bid}} </small></p>
+                {% if product_detail.product_owner == user%}
+                <p class="card-text"><div class="alert alert-secondary" role="alert">
+                    Your listing
+                  </div><br> 
+                    {% if  bid_details   %}
+                     Current highest bid = <b>${{bid_details.amount_bid}}</b><br>{{product_detail.status}}
+                     <p class="fw-lighter fst-italic">Placed by {{bid_details.user_bid}} on {{bid_details.date_bid}}</p>
+                     <p>{% if product_detail.product_status == 'sold'  %}
+                            Bid accepted! 
+                        {% else %}
+
+                     <p>{{product_detail.product_status}}<form method="post" action="accept_bid/{{product_detail.id}}">
+                        {% csrf_token %}
+                        <input type="hidden" name="bid_id" value="{{bid_details.id}}">
+                        <input type="hidden" name="id" value="{{product_detail.id}}">
+                        <input type="submit" value="Accept bid"class="btn btn-primary mb-3">
+                        {% endif %}
+                     </p>
+                    {% else %}
+                    No bids received yet. 
+                     {% endif %}
+                {% else %} <!-- Not product owner -->
+                {% if product_detail.product_status == 'sold'  %}
+                        {% if bid_details.user_bid == user %} 
+                        <div class="alert alert-success" role="alert">
+                            Your bid was successfull! 
+                          </div>
+                        {% else %}
+                <div class="alert alert-secondary" role="alert">Product sold </div>
+                         {% endif %}    
+                   {% else %}
+                   {% if  bid_details   %}
+                     Current highest bid = <b>${{bid_details.amount_bid}}</b><br>
+                     {% endif %} 
+                <form method="post" action="{{product_detail.id}}">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" value="{{product_detail.id}}"><br>
+                    Place your bid:<br>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">$</span>
+                 {{ form.bid }} <br>{{bidform.bid}}
+                <span class="input-group-text">.00</span>
+        </div>     
+                <div class="col-12">
+                    <button class="btn btn-primary" type="submit">Submit bid!</button>
+                  </div> {% endif %}
+                  {%  if bid_result %}
+                  <hr>
+                  <div class="alert alert-success" role="alert">
+                    {{bid_result}}
+                </div>
+                  {% endif %}
+               </form>     
+
+                 {%endif%}        
+            
+        </p>
+          
+       </div>
+       </div>
+</div>
+<div class="card-footer text-body-secondary">
+    <div class="hstack gap-3">
+        <div class="p-2">Listing owner: <b>{{product_detail.product_owner}}</b> inserted on: {{product_detail.date_inserted}}</div>
+        
+         
+      </div>
+     
+  </div>
+ 
+</div>
+
+
+</div><div class="vstack gap-3"><b>Comments:</b>
+ {% for comment in comments %}
+ 
+    <div class="p-2"><b>{{comment.user_comment}}</b> wrote on  {{comment.comment_date_inserted}}:<br>
+        {{comment.comment}}</div>
+        {% empty %}
+        No comments yet!
+    {% endfor %}
+    
+  </div>
+  <div style="padding:20px">
+  <form method="post" action="{{product_detail.id}}">
+    {% csrf_token %}
+    <label for="formGroupExampleInput" class="form-label">Leave a comment:</label><br>
+    {{commentform.comment}}
+<input type="hidden"  value="{{product_detail.id}}" name="id">
+<input type="hidden"  value="{{user}}" name="user"><br><div class="col-12">
+    <button type="submit" class="btn btn-primary">Save</button>
+  </div>
+</form>
+</div>
+   
+  
+{% endblock %}

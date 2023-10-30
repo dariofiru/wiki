@@ -7,15 +7,6 @@
 
     {% for product in product_list %}
 
-    
-  <!---  <div class="card" style="width: 18rem;">
-        <img src="{{product.product_img_url}}" class="card-img-top" alt="...">
-        <div class="card-body">
-            
-          <h5 class="card-title">{{product.product_name}}</h5>
-          <p class="card-text">{{product.product_description}}</p>
-         <br>
-        --->
          <div class="card mb-3" style="max-width: 540px;">
             <div class="row g-0">
               <div class="col-md-4">
@@ -25,7 +16,7 @@
                 <div class="card-body">
                   <h5 class="card-title">{{product.product_name}}</h5>
                   <p class="card-text">{{product.product_description}}</p>
-                  <p class="card-text"><small class="text-body-secondary"> </small></p>
+                  <p class="card-text"><small class="text-body-secondary">Starting bid: ${{product.product_starting_bid}} </small></p>
                
 
 
@@ -37,25 +28,17 @@
   
    {% endif %} 
    {% endfor %} 
-    <p style="padding:20px">
-   {% if product.product_status == 'active' and product.product_owner != user %}
-   <a href="auctions/bid/{{product.id}}" class="btn btn-primary">Make a Bid!</a>
-    
+    <p >
+   {% if product.product_status == 'active'  %}
+   Auction status: <b>Open</b> 
+   {% elif product.product_status == 'sold'  %}
+   Auction status: <b>Closed</b>
+   {% endif %} 
    
-   <a href="auctions/watchlist/add/{{product.id}}" class="btn btn-primary" aria-disabled="true">Add to Watchlist</a>
-   
-  <!-- <a href="auctions/bid/{{product.id}}">bid</a>--->
-   {% elif product.product_status == 'active' and product.product_owner == user %}
-   <a href="auctions/bid/{{product.id}}" class="btn btn-primary">View Details</a>
-   <div class="alert alert-secondary" role="alert">
-    Your Listing! 
-  </div>    
-   {% elif product.product_status == 'sold' and product.product_owner == user %}
-   Sold for {{product.product_price}}
-   {% elif product.product_status == 'sold' and product.product_owner != user %}
-   item sold 
-   {% elif product.product_status == 'sold' %}
-   {% endif %} </p>
+    </div>    
+    </p>
+<p style="padding:10px"><!--- <br><a href="auctions/open_listing/{{product.id}}" class="btn btn-primary">Open Listing</a></p> --->
+<a href="{% url 'open_listing' product.id %}  " class="btn btn-primary">Open Listing</a></p> 
 </div>
 </div>
 </div>
@@ -63,6 +46,6 @@
    {% endfor %}
  
 
- 
- New Listing created successfully <a href="{% url 'index' %}">return to Listing</a> {{test}} {{categ}}
+  
+ New Listing created successfully <a href="{% url 'index' %}">return to Listing</a>  
 {% endblock %}

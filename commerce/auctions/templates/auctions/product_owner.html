@@ -25,7 +25,7 @@
       </p>
 
         {% if not accepted_bid   %}
-        <p><form method="post" action="accept_bid/{{product.id}}">
+        <p><form method="post" action="C{{product.id}}">
          {% csrf_token %}
          <input type="hidden" name="bid_id" value="{{bid_id}}">
      <input type="submit" value="Accept"class="btn btn-primary mb-3">
@@ -39,11 +39,19 @@
 </div>
    {% endfor %} 
 <br><br>
-   {{error}} - {{tot}}
-   <br>{{product_detail}}
-   <br>{{product_update}}
-   <br>max: {{max_bid}}
-   <br>{{product_update.product_status}}
-   <br>{{product_update.product_price}}
+{% for comment in comments %}
+ 
+<div class="p-2"><b>{{comment.user_comment}}</b> wrote on  {{comment.comment_date_inserted}}:<br>
+    {{comment.comment}}</div>
+{% endfor %}
+
+</div>
+<form method="post" action="{{comments}}">
+{% csrf_token %}
+<input type="hidden"  value="{{product.id}}" name="id">
+<input type="hidden"  value="{{user}}" name="user">
+<textarea rows="4" cols="68" name="comment"></textarea>
+<input type="submit" value="save" name="save_comment">
+</form>
 
 {% endblock %}

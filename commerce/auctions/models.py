@@ -69,7 +69,7 @@ class Watchlist(models.Model):
 class Comment(models.Model):
     user_comment = models.ForeignKey(User, on_delete=models.CASCADE)
     product_comment = models.ForeignKey(Product, on_delete=models.CASCADE)
-    comment = models.CharField(max_length=500)
+    comment = models.CharField(max_length=500, blank=True, null=True)
     comment_date_inserted = models.DateField(default=datetime.date.today)
     def __str__(self) -> str:
         return f"Comment: {self.user_comment} on {self.product_comment}"    
