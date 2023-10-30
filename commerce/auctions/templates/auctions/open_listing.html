@@ -21,11 +21,16 @@
                      Current highest bid = <b>${{bid_details.amount_bid}}</b><br>{{product_detail.status}}
                      <p class="fw-lighter fst-italic">Placed by {{bid_details.user_bid}} on {{bid_details.date_bid}}</p>
                      <p>{% if product_detail.product_status == 'sold'  %}
-                            Bid accepted! 
+                        <div class="alert alert-success" role="alert">
+                            Bid accepted! <br><small class="text-body-secondary">${{bid_details.amount_bid}} will be debited on your account.
+                            </small>
+                            </div>
+                             
                         {% else %}
 
-                     <p>{{product_detail.product_status}}<form method="post" action="accept_bid/{{product_detail.id}}">
+                     <p><form method="post" action="accept_bid/{{product_detail.id}}">
                         {% csrf_token %}
+                        
                         <input type="hidden" name="bid_id" value="{{bid_details.id}}">
                         <input type="hidden" name="id" value="{{product_detail.id}}">
                         <input type="submit" value="Accept bid"class="btn btn-primary mb-3">
@@ -38,8 +43,9 @@
                 {% if product_detail.product_status == 'sold'  %}
                         {% if bid_details.user_bid == user %} 
                         <div class="alert alert-success" role="alert">
-                            Your bid was successfull! 
-                          </div>
+                            Your bid was successfull! <br><small class="text-body-secondary">${{bid_details.amount_bid}} will be charged to your account.
+                            </small>
+                            </div>
                         {% else %}
                 <div class="alert alert-secondary" role="alert">Product sold </div>
                          {% endif %}    
@@ -53,7 +59,7 @@
                     Place your bid:<br>
                     <div class="input-group mb-3">
                         <span class="input-group-text">$</span>
-                 {{ form.bid }} <br>{{bidform.bid}}
+                 {{ form.bid }} <br>{{bidform.bid}} {{bidform.bidform_flag}}
                 <span class="input-group-text">.00</span>
         </div>     
                 <div class="col-12">
@@ -100,7 +106,7 @@
   <form method="post" action="{{product_detail.id}}">
     {% csrf_token %}
     <label for="formGroupExampleInput" class="form-label">Leave a comment:</label><br>
-    {{commentform.comment}}
+    {{commentform.comment}} {{commentform.commentform_flag}}
 <input type="hidden"  value="{{product_detail.id}}" name="id">
 <input type="hidden"  value="{{user}}" name="user"><br><div class="col-12">
     <button type="submit" class="btn btn-primary">Save</button>

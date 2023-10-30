@@ -43,7 +43,7 @@ class Product(models.Model):
             super().save(*args, **kwargs)  # Call the "real" save() metho
 
     def __str__(self) -> str:
-        return f"product: {self.product_name} - {self.product_status}"
+        return f"product: {self.product_name} - {self.product_owner} - {self.product_status}"
     
 class Auction(models.Model):
     STATUS = (

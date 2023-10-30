@@ -171,7 +171,7 @@ def open_listing(request, id):
                 comment_tmp.save()
                 commentform=CommentForm(use_required_attribute=False)
                 return render(request, "auctions/open_listing.html", {
-                "product_detail": product_detail ,"comments": comments,
+                "product_detail": product_detail ,"comments": comments, "bid_details": bid_tmp,
                 "bidform": bidform, "commentform":  commentform, "user" : request.user
             })
         else: # bid form  submitted         
