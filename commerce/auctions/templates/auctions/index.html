@@ -1,51 +1,51 @@
 {% extends "auctions/layout.html" %}
-
+{% load mathfilters %}
 {% block body %}
- 
- 
-    <h2>Active Listings</h2>
-
-    {% for product in product_list %}
-
-         <div class="card mb-3" style="max-width: 540px;">
-            <div class="row g-0">
-              <div class="col-md-4">
-                <img src="{{product.product_img_url}}" class="img-fluid rounded-start" alt="...">
-              </div>
-              <div class="col-md-8">
-                <div class="card-body">
-                  <h5 class="card-title">{{product.product_name}}</h5>
-                  <p class="card-text">{{product.product_description}}</p>
-                  <p class="card-text"><small class="text-body-secondary">Starting bid: ${{product.product_starting_bid}} </small></p>
-               
 
 
+<h2>Active Listings</h2>
+
+{% for product in product_list %}
+
  
- 
-   {% for auction in auction_bid %}
-   {% if auction.winning_bid == True and product.id == auction.product_sold.id %}
-   Highest bid: <b>${{auction.amount_bid}}</b> 
-  
-   {% endif %} 
-   {% endfor %} 
-    <p >
-   {% if product.product_status == 'active'  %}
-   Auction status: <b>Open</b> 
-   {% elif product.product_status == 'sold'  %}
-   Auction status: <b>Closed</b>
-   {% endif %} 
-   
-    </div>    
-    </p>
-<p style="padding:10px"><!--- <br><a href="auctions/open_listing/{{product.id}}" class="btn btn-primary">Open Listing</a></p> --->
-<a href="{% url 'open_listing' product.id %}  " class="btn btn-primary">Open Listing</a></p> 
+<div class="card mb-3" style="max-width: 540px;">
+  <div class="row g-0">
+    <div class="col-md-4">
+      <img src="{{product.product_img_url}}" class="img-fluid rounded-start" alt="...">
+    </div>
+    <div class="col-md-8">
+      <div class="card-body">
+        <h5 class="card-title">{{product.product_name}}</h5>
+        <p class="card-text">{{product.product_description}}</p>
+        <p class="card-text"><small class="text-body-secondary">Starting bid: ${{product.product_starting_bid}} </small>
+        </p>
+
+        {% for auction in auction_bid %}
+        {% if auction.winning_bid == True and product.id == auction.product_sold.id %}
+        Highest bid: <b>${{auction.amount_bid}}</b>
+
+        {% endif %}
+        {% endfor %}
+        <p>
+          {% if product.product_status == 'active' %}
+          Auction status: <b>Open</b>
+          {% elif product.product_status == 'sold' %}
+          Auction status: <b>Closed</b>
+          {% endif %}
+
+      </div>
+      </p>
+      <p style="padding:10px">
+        <!--- <br><a href="auctions/open_listing/{{product.id}}" class="btn btn-primary">Open Listing</a></p> --->
+        <a href="{% url 'open_listing' product.id %}  " class="btn btn-primary">Open Listing</a>
+      </p>
+    </div>
+  </div>
 </div>
 </div>
-</div>
-</div>
-   {% endfor %}
- 
+{% endfor %}
 
-  
- New Listing created successfully <a href="{% url 'index' %}">return to Listing</a>  
+
+
+New Listing created successfully <a href="{% url 'index' %}">return to Listing</a>
 {% endblock %}

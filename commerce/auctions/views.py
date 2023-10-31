@@ -151,15 +151,21 @@ def bid(request,id):
 
 @login_required
 def open_listing(request, id):
+    product_detail = Product.objects.filter(id=id).get()
+    comments = Comment.objects.filter(product_comment=product_detail).all()  
+    try:
+        #watch = Watchlist(user_watchlist=request.user ,product_watchlist=Product.objects.filter(id=id).get())
+        watch = Watchlist.objects.filter(product_watchlist=product_detail, user_watchlist=request.user).first()
+        bid_tmp = Auction.objects.filter(product_sold=product_detail, winning_bid=True).get()
+        max_bid = bid_tmp.amount_bid
+    except Auction.DoesNotExist:
+        max_bid = 0  
+        bid_tmp = None
+    except Watchlist.DoesNotExist:
+        watch = None
+        bid_tmp = None
+         
     if request.method == "POST":
-        product_detail = Product.objects.filter(id=id).get()
-        comments = Comment.objects.filter(product_comment=product_detail).all()  
-        try:
-            bid_tmp = Auction.objects.filter(product_sold=product_detail, winning_bid=True).get()
-            max_bid = bid_tmp.amount_bid
-
-        except Auction.DoesNotExist:
-            max_bid = 0  
 
 
         if 'commentform_flag' in request.POST:
@@ -172,7 +178,7 @@ def open_listing(request, id):
                 commentform=CommentForm(use_required_attribute=False)
                 return render(request, "auctions/open_listing.html", {
                 "product_detail": product_detail ,"comments": comments, "bid_details": bid_tmp,
-                "bidform": bidform, "commentform":  commentform, "user" : request.user
+                "bidform": bidform, "commentform":  commentform, "user" : request.user, "watch" : watch
             })
         else: # bid form  submitted         
             bidform=BidForm(request.POST)
@@ -181,10 +187,13 @@ def open_listing(request, id):
            #if bidform.is_valid():  
             actual_bid=bidform.cleaned_data['bid'] #retrive actual bid 
             if  actual_bid > max_bid and actual_bid >= product_detail.product_starting_bid: #actual bid is the winner! #check bid result
-                    bid_tmp = Auction.objects.filter(product_sold=product_detail, winning_bid=True).all()
-                    for auction in bid_tmp:
-                        auction.winning_bid = False
-                        auction.save(update_fields=["winning_bid"]) 
+                    try:
+                        bid_tmp = Auction.objects.filter(product_sold=product_detail, winning_bid=True).all()
+                        for auction in bid_tmp:
+                            auction.winning_bid = False
+                            auction.save(update_fields=["winning_bid"]) 
+                    except Auction.DoesNotExist:
+                        bid_tmp = None 
 
                     bid_tmp=Auction(product_sold=product_detail, user_bid=request.user,amount_bid=actual_bid, winning_bid=True)
                     bid_tmp.save()
@@ -202,25 +211,17 @@ def open_listing(request, id):
 
             return render(request, "auctions/open_listing.html", {
                 "product_detail": product_detail ,  "bid_result":bid_result, "comments": comments,
-                "bidform": bidform, "commentform":  commentform, "bid_details": bid_tmp, "user" : request.user
+                "bidform": bidform, "commentform":  commentform, "bid_details": bid_tmp, "user" : request.user, "watch" : watch
             })
     else:
-        product_detail = Product.objects.filter(id=id).get() 
-        comments = Comment.objects.filter(product_comment=product_detail).all()  
-        try:
-            bid_tmp = Auction.objects.filter(product_sold=product_detail, winning_bid=True).get()
-            max_bid = bid_tmp.amount_bid
-
-        except Auction.DoesNotExist:
-            bid_tmp = None  
-
-
+ 
         bidform=BidForm()
         commentform=CommentForm(use_required_attribute=False) 
         return render(request, "auctions/open_listing.html", {
                 "product_detail": product_detail , "comments": comments,
-                "bidform": bidform, "commentform":  commentform, "bid_details": bid_tmp, "user" : request.user
-            })     
+                "bidform": bidform, "commentform":  commentform, "bid_details": bid_tmp, "user" : request.user, "watch" : watch
+            })    
+
 
 
          
@@ -290,18 +291,33 @@ def add(request):
     
 @login_required
 def add_watchlist(request, id):
-    watch = Watchlist(user_watchlist=request.user ,product_watchlist=Product.objects.filter(id=id).get() )
-    watch.save()
+    product_detail = Product.objects.filter(id=id).get()
+    try:
+        #watch = Watchlist(user_watchlist=request.user ,product_watchlist=Product.objects.filter(id=id).get())
+        watch = Watchlist.objects.filter(product_watchlist=product_detail, user_watchlist=request.user).first()
+    except Watchlist.DoesNotExist:
+         watch = Watchlist(user_watchlist=request.user ,product_watchlist=Product.objects.filter(id=id).first())
+         watch.save()
 
-    product_list = Product.objects.all()
-             
-    for product in product_list:
-                auction_bid = Auction.objects.select_related().filter()
-               
-    #return HttpResponseRedirect(reverse("index"))
-    return render(request,"auctions/index.html", {
-                "product_list": product_list, "auction_bid": auction_bid, "user": request.user
-            })
+    product_detail = Product.objects.filter(id=id).get() 
+    comments = Comment.objects.filter(product_comment=product_detail).all()  
+    try:
+        bid_tmp = Auction.objects.filter(product_sold=product_detail, winning_bid=True).get()
+        max_bid = bid_tmp.amount_bid
+
+    except Auction.DoesNotExist:
+        bid_tmp = None  
+
+
+    bidform=BidForm()
+    commentform=CommentForm(use_required_attribute=False) 
+    return render(request, "auctions/open_listing.html", {
+                "product_detail": product_detail , "comments": comments,
+                "bidform": bidform, "commentform":  commentform, "bid_details": bid_tmp, "user" : request.user,
+                "watchlistD" : "true"
+            })     
+
+
 
 
 @login_required

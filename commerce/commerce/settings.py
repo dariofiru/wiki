@@ -32,6 +32,7 @@ LOGIN_URL = '/login'
 
 INSTALLED_APPS = [
     'auctions',
+    'mathfilters',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
