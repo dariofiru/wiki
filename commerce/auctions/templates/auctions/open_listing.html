@@ -33,7 +33,7 @@
                         {% else %}
 
                         <p><form method="post"
-                                action="accept_bid/{{product_detail.id}}">
+                                action="{% url 'accept_bid' product_detail.id %}">
                                 {% csrf_token %}
 
                                 <input type="hidden" name="bid_id"
@@ -42,6 +42,7 @@
                                     value="{{product_detail.id}}">
                                 <input type="submit" value="Accept bid"
                                     class="btn btn-primary mb-3">
+                                    </form>
                                 {% endif %}
                             </p>
                             {% else %}
@@ -135,7 +136,7 @@
 
     </div>
     <div style="padding:20px">
-        <form method="post" action="{{product_detail.id}}">
+        <form method="post" action="{% url 'open_listing' product_detail.id %}">
             {% csrf_token %}
             <label for="formGroupExampleInput" class="form-label">Leave a
                 comment:</label><br>
@@ -147,9 +148,7 @@
             </div>
         </form>
         <br>
-        {% if watchlistD %}
-                                   -- {{watchlistD}} --{{product_detail}} -- {{comments}} -- {{bid_tmp}} -- {{user}}
-                                   {%endif%}
+        
     </div>
 
     {% endblock %}

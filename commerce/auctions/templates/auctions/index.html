@@ -2,8 +2,14 @@
 {% load mathfilters %}
 {% block body %}
 
-
+{% if new_entry %}
+<h2>New Listing</h2>
+{% elif watchlist_header %}
+<h2>Watchlist</h2>
+{% else %}
 <h2>Active Listings</h2>
+{%endif%}
+
 
 {% for product in product_list %}
 
@@ -46,6 +52,10 @@
 {% endfor %}
 
 
-
+{% if new_entry %}
 New Listing created successfully <a href="{% url 'index' %}">return to Listing</a>
+{%endif%}
+{% if watchlist_empty %}
+Your watchlist is currently empty 
+{%endif%}
 {% endblock %}

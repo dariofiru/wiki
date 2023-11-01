@@ -19,14 +19,41 @@ def index(request):
                 auction_bid = Auction.objects.select_related().filter()
             if request.user is not None:   
            # return HttpResponseRedirect(reverse("index"))
-             return render(request, "auctions/index.html", {
+                return render(request, "auctions/index.html", {
                 "product_list": product_list, "auction_bid": auction_bid #, "user": request.user
                     #,                "user_watchlist": user_watch
                  }) 
             else:
-                  return render(request, "auctions/index.html", {
+                return render(request, "auctions/index.html", {
                 "product_list": product_list, "auction_bid": auction_bid 
                  }) 
+            
+@login_required
+def watchlist(request):
+            tmp_list= []
+            try:
+                user_watch_list = Watchlist.objects.filter(user_watchlist=request.user).get()
+            except Watchlist.DoesNotExist:
+                user_watch_list = None
+                return render(request, "auctions/index.html", {
+               "watchlist_empty": True , "watchlist_header" : True
+            }) 
+            except Watchlist.MultipleObjectsReturned:
+                 pass 
+
+            user_watch_list = Watchlist.objects.filter(user_watchlist=request.user).all()
+
+            for watch in user_watch_list:
+                tmp_list.append(watch.product_watchlist.id) 
+
+            product_list =  Product.objects.filter(pk__in=tmp_list).all()
+               
+            for product in product_list:
+                auction_bid = Auction.objects.select_related().filter()
+           # return HttpResponse(f"  {tmp_list} - {product_list[1]} ")
+            return render(request, "auctions/index.html", {
+               "product_list": product_list, "auction_bid": auction_bid , "watchlist_header" : True
+            }) 
 
 def login_view(request):
     if request.method == "POST":
@@ -227,11 +254,12 @@ def open_listing(request, id):
          
 @login_required    
 def accept_bid(request,id): 
+      product_detail = Product.objects.filter(id=id).get()
+      comments = Comment.objects.filter(product_comment=product_detail).all() 
       if request.method == "POST":
         commentform=CommentForm(use_required_attribute=False)
         bid_id = request.POST["bid_id"] 
         prod_id = request.POST["id"]
-        product_detail = Product.objects.filter(id=prod_id).get()
         try:
             max_bid_model = Auction.objects.filter(id=bid_id,winning_bid=True).get() 
             max_bid= max_bid_model.amount_bid
@@ -239,9 +267,8 @@ def accept_bid(request,id):
         except Auction.DoesNotExist:
              return HttpResponse("error, please contact support")
 
-
         Product.objects.filter(id=id).update(product_status="sold",date_sold=date.today() ,product_price=max_bid)
-        product_detail= Product.objects.filter(id=prod_id).get()
+        #product_detail= Product.objects.filter(id=prod_id).get()
         bids = Auction.objects.filter(product_sold=Product.objects.filter(id=id).first())  #retrive all bids on product
         for auction in bids:
                 auction.status_bid = "inactive" 
@@ -272,14 +299,14 @@ def add(request):
                      prod.product_categories.add(categ)
                      prod.save()
                 return render(request, "auctions/index.html", {
-        "entries": None, "categ": categ
+        "new_entry": True
     })
-            else:
+        #    else:
 
 
-                return render(request, "auctions/index.html", {
-        "entries": None, "categ": None, "formt": form 
-    })
+         #       return render(request, "auctions/index.html", {
+       # "entries": None, "categ": None, "formt": form 
+    #})
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -342,21 +369,6 @@ def remove_watchlist(request, id):
                 "watch" : watch
             })     
 
-
-
-@login_required
-def watchlist(request):
-           # product_list = Product.objects.all()
-            user_watch_list = Watchlist.objects.filter(user_watchlist=request.user).all()
-            for watch in user_watch_list:
-                product_watched = Product.objects.select_related().filter().all()
-               
-           # return HttpResponseRedirect(reverse("index"))
-            return render(request, "auctions/watchlist.html", {
-                "user_watch_list": user_watch_list, "product_watched": product_watched 
-            }) 
-
-
 def categories(request):
     categories = Category.objects.all()
     return render(request, "auctions/categories.html", { "categories" : categories    
@@ -374,10 +386,7 @@ def category_chosen(request, id):
                 "product_list": product_list, "auction_bid": auction_bid #, "user": request.user
                     #,                "user_watchlist": user_watch
                 }) 
-   # return render(request, "auctions/index.html", {
-    #            "product_list": product_list, "auction_bid": auction_bid #, "user": request.user
-                    #,                "user_watchlist": user_watch
-     #           }) 
+
 
 def comments(request, id):
     product_detail = Product.objects.filter(id=id)
