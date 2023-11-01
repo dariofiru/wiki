@@ -105,14 +105,15 @@
                             inserted on: {{product_detail.date_inserted}}  
                     </div>
                             <div class="p-2">
-                                 <a href="{% url 'add_watchlist' product_detail.id %}" > 
-                                    
+                                 
+                                  
                                 
-                                {% if watch %}
-                                <button type="button"   class="btn btn-outline-dark btn-sm">
+                                {% if  watch %}
+                                <a href="{% url 'remove_watchlist' product_detail.id %}" > <button type="button"   class="btn btn-outline-dark btn-sm">
                                     Remove from Watchlist</button></a><br>
                                 {%else %}
-                                <button type="button"  class="btn btn-outline-primary btn-sm">Add to Watchlist</button></a><br>
+                                <a href="{% url 'add_watchlist'  product_detail.id %}" > <button type="button"  class="btn btn-outline-primary btn-sm">
+                                    Add to Watchlist</button></a><br>
                                 {%endif%}        
                             </div>  
 

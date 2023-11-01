@@ -291,15 +291,41 @@ def add(request):
     
 @login_required
 def add_watchlist(request, id):
+    product_detail = Product.objects.filter(id=id).first()
+ 
+    try:
+        watch = Watchlist.objects.filter(product_watchlist=product_detail, user_watchlist=request.user).get()
+    except Watchlist.DoesNotExist:
+         watch = Watchlist(user_watchlist=request.user ,product_watchlist=product_detail)
+         watch.save()
+    
+    comments = Comment.objects.filter(product_comment=product_detail).all()  
+    try:
+        bid_tmp = Auction.objects.filter(product_sold=product_detail, winning_bid=True).get()
+        max_bid = bid_tmp.amount_bid
+
+    except Auction.DoesNotExist:
+        bid_tmp = None  
+    
+    bidform=BidForm()
+    commentform=CommentForm(use_required_attribute=False) 
+    return render(request, "auctions/open_listing.html", {
+                "product_detail": product_detail , "comments": comments,
+                "bidform": bidform, "commentform":  commentform, "bid_details": bid_tmp, "user" : request.user,
+                "watch" : watch
+            })     
+
+
+@login_required
+def remove_watchlist(request, id):
     product_detail = Product.objects.filter(id=id).get()
     try:
-        #watch = Watchlist(user_watchlist=request.user ,product_watchlist=Product.objects.filter(id=id).get())
-        watch = Watchlist.objects.filter(product_watchlist=product_detail, user_watchlist=request.user).first()
+         watch = Watchlist.objects.filter(product_watchlist=product_detail, user_watchlist=request.user).get()
+         watch.delete()
+         watch = None
     except Watchlist.DoesNotExist:
-         watch = Watchlist(user_watchlist=request.user ,product_watchlist=Product.objects.filter(id=id).first())
-         watch.save()
+         watch = None
 
-    product_detail = Product.objects.filter(id=id).get() 
     comments = Comment.objects.filter(product_comment=product_detail).all()  
     try:
         bid_tmp = Auction.objects.filter(product_sold=product_detail, winning_bid=True).get()
@@ -308,15 +334,13 @@ def add_watchlist(request, id):
     except Auction.DoesNotExist:
         bid_tmp = None  
 
-
     bidform=BidForm()
     commentform=CommentForm(use_required_attribute=False) 
     return render(request, "auctions/open_listing.html", {
                 "product_detail": product_detail , "comments": comments,
                 "bidform": bidform, "commentform":  commentform, "bid_details": bid_tmp, "user" : request.user,
-                "watchlistD" : "true"
+                "watch" : watch
             })     
-
 
 
 
