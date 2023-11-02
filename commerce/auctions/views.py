@@ -246,7 +246,8 @@ def open_listing(request, id):
         commentform=CommentForm(use_required_attribute=False) 
         return render(request, "auctions/open_listing.html", {
                 "product_detail": product_detail , "comments": comments,
-                "bidform": bidform, "commentform":  commentform, "bid_details": bid_tmp, "user" : request.user, "watch" : watch
+                "bidform": bidform, "commentform":  commentform, "bid_details": bid_tmp, "user" : request.user, "watch" : watch,
+                "pippo" : "pippo"
             })    
 
 
@@ -254,9 +255,21 @@ def open_listing(request, id):
          
 @login_required    
 def accept_bid(request,id): 
-      product_detail = Product.objects.filter(id=id).get()
-      comments = Comment.objects.filter(product_comment=product_detail).all() 
-      if request.method == "POST":
+    product_detail = Product.objects.filter(id=id).get()
+    comments = Comment.objects.filter(product_comment=product_detail).all() 
+    try:
+        #watch = Watchlist(user_watchlist=request.user ,product_watchlist=Product.objects.filter(id=id).get())
+            watch = Watchlist.objects.filter(product_watchlist=product_detail, user_watchlist=request.user).first()
+            bid_tmp = Auction.objects.filter(product_sold=product_detail, winning_bid=True).get()
+            max_bid = bid_tmp.amount_bid
+    except Auction.DoesNotExist:
+            max_bid = 0  
+            bid_tmp = None
+    except Watchlist.DoesNotExist:
+            watch = None
+            bid_tmp = None
+
+    if request.method == "POST":
         commentform=CommentForm(use_required_attribute=False)
         bid_id = request.POST["bid_id"] 
         prod_id = request.POST["id"]
@@ -266,9 +279,10 @@ def accept_bid(request,id):
 
         except Auction.DoesNotExist:
              return HttpResponse("error, please contact support")
-
-        Product.objects.filter(id=id).update(product_status="sold",date_sold=date.today() ,product_price=max_bid)
-        #product_detail= Product.objects.filter(id=prod_id).get()
+        bidform=BidForm()
+        product_detail=Product.objects.filter(id=id).update(product_status="sold",date_sold=date.today() ,product_price=max_bid)
+        
+        product_detail= Product.objects.filter(id=prod_id).get()
         bids = Auction.objects.filter(product_sold=Product.objects.filter(id=id).first())  #retrive all bids on product
         for auction in bids:
                 auction.status_bid = "inactive" 
@@ -276,7 +290,8 @@ def accept_bid(request,id):
 
         return render(request, "auctions/open_listing.html", {
                 "product_detail": product_detail , "comments": comments,
-                  "commentform":  commentform, "bid_details": max_bid_model, "bid_accepted": True
+                 "bidform": bidform, "commentform":  commentform, "bid_details": max_bid_model, "bid_accepted": True,
+                    "user" : request.user, "watch" : watch, "pippo": "pluto"
             })     
 
 

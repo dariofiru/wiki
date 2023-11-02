@@ -31,7 +31,7 @@
                         </div>
 
                         {% else %}
-
+                         
                         <p><form method="post"
                                 action="{% url 'accept_bid' product_detail.id %}">
                                 {% csrf_token %}
@@ -150,5 +150,6 @@
         <br>
         
     </div>
-
+    
+   
     {% endblock %}
