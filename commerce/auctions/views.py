@@ -389,20 +389,7 @@ def categories(request):
     return render(request, "auctions/categories.html", { "categories" : categories    
             })
 
-def category_chosen(request, id):
-    category = Category.objects.filter(id=id).get()
-    product_list = Product.objects.filter(product_categories=category).all()
-           # user_watch = Watchlist.objects.filter(user_watchlist=request.user).all()
-    for product in product_list:
-                auction_bid = Auction.objects.select_related().filter()
-                
-                
-    return render(request, 'auctions/index.html', {
-                "product_list": product_list, "auction_bid": auction_bid #, "user": request.user
-                    #,                "user_watchlist": user_watch
-                }) 
-
-
+@login_required
 def comments(request, id):
     product_detail = Product.objects.filter(id=id)
     comments = Comment.objects.filter(product_comment=product_detail.first()).all()
